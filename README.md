@@ -9,7 +9,102 @@ This image is designed to serve as a development environment for upgrading the M
 Database: mySQL 5.6
 Redis, Varnish, Elasticsearch and RabbitMQ
 Web: PHP 7.2.1, Apache2
-The web image contains a set of scripts to install Magento. However you must first
+
+# Instructions
+
+Prerequesits : Docker Community Edition
+
+**Step 1**: Create an empty file named docker-compose.yml and place it in a new folder. The name you choose as the folder name will be used later so make sure you name it something descriptive. When the containers get created in step 3 Docker uses the folder name as the beginning part of the container name followed by the service name and instance. ex myfolder_web_1
+
+**Step 2**: Past the following content into the docker-compose.yml file:
+
+```
+version: '3'
+services:
+web:
+restart: always
+image: giabmf11/php72-upgrade
+volumes:
+- "~/.gitconfig:/home/magento2/.gitconfig"
+- "~/.composer:/home/magento2/.composer"
+- "~/.ssh:/home/magento2/.ssh"
+- "./shared/logs/apache2:/var/log/apache2"
+- "./shared/logs/php-fpm:/var/log/php-fpm"
+- "./shared/configs/varnish:/home/magento2/configs/varnish"
+- "./shared/.magento-cloud:/home/magento2/.magento-cloud"
+environment:
+- MAGENTO_BACKEND_PATH=admin
+- MAGENTO_ADMIN_USER=admin
+- MAGENTO_ADMIN_PASSWORD=admin123
+ports:
+- "80"
+- "22"
+db:
+restart: always
+image: mysql:5.6
+ports:
+- "3306"
+environment:
+- MYSQL_ROOT_PASSWORD=root
+- MYSQL_DATABASE=magento2
+volumes:
+- "./shared/var/logs/mysql:/var/log/mysql"
+
+elasticsearch:
+image: elasticsearch:2
+ports:
+- "9200"
+volumes:
+- "./shared/esdata:/usr/share/elasticsearch/data"
+```
+
+
+**Step 3**: Open a terminal and navigate to the directory you just created in step 1 and run the following command:
+
+```
+docker-compose up -d
+```
+
+
+**Step 4**: Run the following command to see the new containers and their details.
+
+```
+docker ps
+```
+
+
+**Step 5**: Find the web container and copy it's name. The web container name will be in the following format: [FolderName]-web-1.
+
+**Step 6**: Copy your Magento source files into the web container. Make sure you change the following commands to copy the source code into the web container name you copied in step 5. "dockertest_web_1" is only an example.
+
+```
+docker cp ~/git/magento2ce dockertest_web_1:/var/www/magento2ce
+docker cp ~/git/magento2ee dockertest_web_1:/var/www/magento2ee
+```
+
+
+**Step 7**: Run the relink.sh script in the web container
+
+```
+docker-compose exec --user=magento2 web relink.sh
+```
+
+
+**Step 8**: Find the port docker is exposing for the web by running the the following command. The format will be 0.0.0.0:[port]. Copy the port. ex 32909
+
+```
+docker-compose port web 80
+```
+
+**Step 9**: Using the port you copied in step 8 run the install.sh script in the web container. "32909" is only an example.
+
+```
+docker-compose exec --user=magento2 web install.sh 32909
+```
+
+
+**Step 10**: Navigate to your instance by going to http://localhost:[port from step 8]. ex http://localhost:32909.
+
 
 # Comments, questions, bug reports, contributions?
 

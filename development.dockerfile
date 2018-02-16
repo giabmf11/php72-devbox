@@ -3,10 +3,7 @@ FROM php:7.2.1-fpm
 MAINTAINER "Magento"
 
 ENV PHP_EXTRA_CONFIGURE_ARGS="--enable-fpm --with-fpm-user=magento2 --with-fpm-group=magento2"
-ENV CONTAINER_PATH=/home/magento2
 ARG DEBIAN_FRONTED=noninteractive
-
-WORKDIR $CONTAINER_PATH
     
 RUN apt-get update && apt-get install -y \
     apt-utils \
@@ -15,7 +12,6 @@ RUN apt-get update && apt-get install -y \
     unzip \
     cron \
     curl \
-    libmcrypt-dev \
     libsodium-dev \
     libicu-dev \
     libxml2-dev libxslt1-dev \
@@ -37,7 +33,8 @@ RUN apt-get update && apt-get install -y \
              cd /root && rm -rf /tmp/unison-2.48.4 \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
-    && docker-php-ext-install -j$(nproc) intl xsl gd zip pdo_mysql opcache soap bcmath json iconv \
+    && docker-php-ext-configure sodium --with-sodium \
+    && docker-php-ext-install -j$(nproc) intl xsl gd zip pdo_mysql opcache soap bcmath json iconv sodium \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
@@ -121,6 +118,7 @@ RUN chown -R magento2:magento2 /home/magento2 && \
 RUN passwd magento2 -d
 
 EXPOSE 80 22 5000 44100
+WORKDIR /home/magento2
 
 USER root
 
