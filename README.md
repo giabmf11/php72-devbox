@@ -6,15 +6,17 @@ This repository contains the files needed to create both a development and integ
 
 This image is designed to serve as a development environment for upgrading the Magento2 stack to php7.2. The Docker image brings up three containers:
 
-Database: mySQL 5.6
-Redis, Varnish, Elasticsearch and RabbitMQ
-Web: PHP 7.2.1, Apache2
+**Database:** mySQL 5.6
+
+**Service:** Redis, Varnish, Elasticsearch and RabbitMQ
+
+**Web:** PHP 7.2.1, Apache2
 
 # Instructions
 
 Prerequesits : Docker Community Edition
 
-**Step 1**: Open a terminal window and clone the php72-devbox-shared-local repository on your local system.
+**Step 1**: Open a terminal window and clone the php72-devbox repository on your local system.
 The name you choose as the folder name will be used later so make sure you name it
 something descriptive. When the containers get created in step 3 Docker uses the folder
 name as the beginning part of the container name followed by the service name and
