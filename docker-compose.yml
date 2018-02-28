@@ -2,10 +2,10 @@ version: '3'
 services:
   web:
     restart: always
-    #build: 
-    #   context: .
-    #   dockerfile: development.dockerfile
-    image: giabmf11/php72-upgrade
+    build:
+       context: .
+       dockerfile: dockerfile
+    #image: giabmf11/php72-upgrade
     volumes:
       - "~/.gitconfig:/home/magento2/.gitconfig"
       - "~/.composer:/home/magento2/.composer"
@@ -38,36 +38,3 @@ services:
         - "9200"
       volumes:
       - "./shared/esdata:/usr/share/elasticsearch/data"
-      
-      
-      version: '3'
-services:
-web:
-restart: always
-image: giabmf11/php72-upgrade
-volumes:
-
-environment:
-- MAGENTO_BACKEND_PATH=admin
-- MAGENTO_ADMIN_USER=admin
-- MAGENTO_ADMIN_PASSWORD=admin123
-ports:
-- "80"
-- "22"
-db:
-restart: always
-image: mysql:5.6
-ports:
-- "3306"
-environment:
-- MYSQL_ROOT_PASSWORD=root
-- MYSQL_DATABASE=magento2
-volumes:
-- "./shared/var/logs/mysql:/var/log/mysql"
-
-elasticsearch:
-image: elasticsearch:2
-ports:
-- "9200"
-volumes:
-- "./shared/esdata:/usr/share/elasticsearch/data"
